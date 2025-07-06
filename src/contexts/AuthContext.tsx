@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Cliente, AuthContextType } from '../types';
 import { clienteAPI } from '../services/api';
 
@@ -16,7 +17,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: AuthProviderProps) => {
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -41,12 +42,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const { cliente: clienteData, token } = await clienteAPI.login(telefone);
       // Mapear os dados do backend para o formato do frontend
+      const c: any = clienteData;
       const clienteMapeado = {
-        id: clienteData.id,
-        nome: clienteData.name,
-        telefone: clienteData.phone,
-        email: clienteData.email,
-        endereco: clienteData.address,
+        id: c.id,
+        nome: c.name || c.nome,
+        telefone: c.phone || c.telefone,
+        email: c.email,
+        endereco: c.address || c.endereco,
         data_cadastro: new Date().toISOString()
       };
       setCliente(clienteMapeado);

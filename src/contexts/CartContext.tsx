@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { Produto, ItemCarrinho, CartContextType } from '../types';
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -15,26 +16,8 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
-export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+export const CartProvider: React.FC<CartProviderProps> = ({ children }: CartProviderProps) => {
   const [items, setItems] = useState<ItemCarrinho[]>([]);
-
-  // Carregar carrinho do localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart_items');
-    if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Erro ao carregar carrinho:', error);
-        localStorage.removeItem('cart_items');
-      }
-    }
-  }, []);
-
-  // Salvar carrinho no localStorage sempre que mudar
-  useEffect(() => {
-    localStorage.setItem('cart_items', JSON.stringify(items));
-  }, [items]);
 
   const addItem = (produto: Produto, quantidade: number) => {
     setItems(prevItems => {
@@ -61,7 +44,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       removeItem(produtoId);
       return;
     }
-
+    
     setItems(prevItems =>
       prevItems.map(item =>
         item.produto.id === produtoId

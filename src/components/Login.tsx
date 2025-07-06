@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, User, Mail, MapPin, Eye, EyeOff } from 'lucide-react';
+import { Phone, User, Mail, MapPin } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { clienteAPI } from '../services/api';
 
@@ -8,7 +9,6 @@ const Login: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   
   // Login form
   const [telefone, setTelefone] = useState('');
@@ -43,7 +43,7 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const { cliente: clienteData, token } = await clienteAPI.cadastrar({
+      await clienteAPI.cadastrar({
         nome,
         telefone,
         email: email || undefined,

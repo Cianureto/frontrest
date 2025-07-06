@@ -37,7 +37,7 @@ export const clienteAPI = {
     idade: number;
   }): Promise<{ cliente: Cliente; token: string }> => {
     // Primeiro cadastra o cliente
-    const registerResponse = await api.post('/api/customers/register', {
+    await api.post('/api/customers/register', {
       name: dados.nome,
       phone: dados.telefone,
       address: dados.endereco || '',

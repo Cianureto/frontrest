@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Plus, Minus, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
@@ -6,7 +7,7 @@ import { useCart } from '../contexts/CartContext';
 const Cart: React.FC = () => {
   const { items, removeItem, updateQuantity, clearCart, total, itemCount } = useCart();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
@@ -11,7 +11,7 @@ import Orders from './components/Orders';
 import { useAuth } from './contexts/AuthContext';
 
 // Componente para rotas protegidas
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
@@ -22,7 +22,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 // Componente para rotas públicas (apenas para usuários não autenticados)
-const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   
   if (isAuthenticated) {
