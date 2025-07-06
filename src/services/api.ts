@@ -76,10 +76,10 @@ export const clienteAPI = {
     cliente?: any;
   }): Promise<Pedido> => {
     // Primeiro buscar os produtos para obter os preços
-    const produtos = await this.getProdutos();
+    const produtos = await clienteAPI.getProdutos();
     
     const items = dados.itens.map(item => {
-      const produto = produtos.find(p => p.id === item.produto_id);
+      const produto = produtos.find((p: Produto) => p.id === item.produto_id);
       return {
         menu_item_id: item.produto_id,
         quantity: item.quantidade,
@@ -105,7 +105,7 @@ export const clienteAPI = {
       },
       itens: response.data.items.map((item: any) => ({
         produto_id: item.menu_item_id,
-        produto: produtos.find(p => p.id === item.menu_item_id) || {
+        produto: produtos.find((p: Produto) => p.id === item.menu_item_id) || {
           id: item.menu_item_id,
           nome: 'Produto',
           descricao: '',
@@ -131,7 +131,7 @@ export const clienteAPI = {
 
   getPedido: async (id: number): Promise<Pedido> => {
     const response = await api.get(`/api/orders/${id}`);
-    const produtos = await this.getProdutos();
+    const produtos = await clienteAPI.getProdutos();
     
     return {
       id: response.data.id,
@@ -144,7 +144,7 @@ export const clienteAPI = {
       },
       itens: response.data.items.map((item: any) => ({
         produto_id: item.menu_item_id,
-        produto: produtos.find(p => p.id === item.menu_item_id) || {
+        produto: produtos.find((p: Produto) => p.id === item.menu_item_id) || {
           id: item.menu_item_id,
           nome: 'Produto',
           descricao: '',
