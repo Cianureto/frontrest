@@ -21,8 +21,8 @@ api.interceptors.request.use((config) => {
 
 export const clienteAPI = {
   // Autenticação
-  login: async (telefone: string): Promise<{ cliente: Cliente; token: string }> => {
-    const response = await api.post('/api/customers/login', { phone: telefone });
+  login: async (telefone: string, senha: string): Promise<{ cliente: Cliente; token: string }> => {
+    const response = await api.post('/api/customers/login', { phone: telefone, password: senha });
     return {
       cliente: response.data.customer,
       token: response.data.token
@@ -35,18 +35,21 @@ export const clienteAPI = {
     email?: string;
     endereco?: string;
     idade: number;
+    password: string;
   }): Promise<{ cliente: Cliente; token: string }> => {
     // Primeiro cadastra o cliente
     await api.post('/api/customers/register', {
       name: dados.nome,
       phone: dados.telefone,
       address: dados.endereco || '',
-      age: dados.idade
+      age: dados.idade,
+      password: dados.password
     });
 
     // Depois faz login
-    const loginResponse = await api.post('/api/customers/login', { 
-      phone: dados.telefone 
+    const loginResponse = await api.post('/api/customers/login', {
+      phone: dados.telefone,
+      password: dados.password
     });
 
     return {

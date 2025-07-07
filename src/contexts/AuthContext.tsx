@@ -38,9 +38,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: AuthProv
     setLoading(false);
   }, []);
 
-  const login = async (telefone: string) => {
+  const login = async (telefone: string, senha: string) => {
     try {
-      const { cliente: clienteData, token } = await clienteAPI.login(telefone);
+      const { cliente: clienteData, token } = await clienteAPI.login(telefone, senha);
       // Mapear os dados do backend para o formato do frontend
       const c: any = clienteData;
       const clienteMapeado = {

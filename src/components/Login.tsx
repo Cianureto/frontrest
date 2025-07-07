@@ -12,6 +12,8 @@ const Login: React.FC = () => {
   
   // Login form
   const [telefone, setTelefone] = useState('');
+  const [senha, setSenha] = useState('');
+  const [showSenha, setShowSenha] = useState(false);
   
   // Register form
   const [nome, setNome] = useState('');
@@ -28,7 +30,7 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      await login(telefone);
+      await login(telefone, senha);
       navigate('/menu');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Erro ao fazer login');
@@ -48,11 +50,12 @@ const Login: React.FC = () => {
         telefone,
         email: email || undefined,
         endereco: endereco || undefined,
-        idade: parseInt(idade)
+        idade: parseInt(idade),
+        password: senha
       });
 
       // Fazer login automaticamente após cadastro
-      await login(telefone);
+      await login(telefone, senha);
       navigate('/menu');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Erro ao fazer cadastro');
@@ -200,6 +203,37 @@ const Login: React.FC = () => {
               </div>
             </div>
 
+            {/* Campo de senha para login e cadastro */}
+            <div>
+              <label htmlFor="senha" className="block text-sm font-medium text-gray-700">
+                Senha
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  id="senha"
+                  name="senha"
+                  type={showSenha ? 'text' : 'password'}
+                  required
+                  value={senha}
+                  onChange={e => setSenha(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm pr-10"
+                  placeholder="Digite sua senha"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowSenha(!showSenha)}
+                  tabIndex={-1}
+                >
+                  {showSenha ? (
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  ) : (
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
             <div>
               <button
                 type="submit"
@@ -234,6 +268,8 @@ const Login: React.FC = () => {
                   setEmail('');
                   setEndereco('');
                   setIdade('');
+                  setSenha(''); // Reset password field
+                  setShowSenha(false); // Hide password field
                 }}
                 className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
