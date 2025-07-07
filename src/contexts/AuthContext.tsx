@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: AuthProv
       const clienteMapeado = {
         id: c.id,
         nome: c.name || c.nome,
-        telefone: c.phone || c.telefone,
+        telefone: (c.phone || c.telefone || '').replace(/\D/g, ''), // só números
         email: c.email,
         endereco: c.address || c.endereco,
         data_cadastro: new Date().toISOString()

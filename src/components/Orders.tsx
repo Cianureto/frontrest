@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Package, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
 import { Pedido } from '../types';
 import { clienteAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import HamburgerIcon from './icons/HamburgerIcon';
 
 const Orders: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -11,15 +13,18 @@ const Orders: React.FC = () => {
   const [error, setError] = useState('');
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
   const navigate = useNavigate();
+  const { cliente } = useAuth();
 
   useEffect(() => {
-    carregarPedidos();
-  }, []);
+    if (cliente?.telefone) {
+      carregarPedidos(cliente.telefone);
+    }
+  }, [cliente]);
 
-  const carregarPedidos = async () => {
+  const carregarPedidos = async (telefone: string) => {
     try {
       setLoading(true);
-      const data = await clienteAPI.getPedidos();
+      const data = await clienteAPI.getPedidos(telefone);
       setPedidos(data);
     } catch (error: any) {
       setError('Erro ao carregar pedidos');
@@ -61,6 +66,13 @@ const Orders: React.FC = () => {
           color: 'text-blue-600',
           bgColor: 'bg-blue-100',
           text: 'Preparando'
+        };
+      case 'out_for_delivery':
+        return {
+          icon: HamburgerIcon,
+          color: 'text-orange-600',
+          bgColor: 'bg-orange-100',
+          text: 'Saiu para entrega'
         };
       case 'pronto':
         return {
@@ -198,6 +210,17 @@ const Orders: React.FC = () => {
                           <Eye size={16} className="text-gray-400" />
                         </div>
                       </div>
+                      {/* Confirmação visual para o cliente */}
+                      {pedido.status === 'preparando' && (
+                        <div className="mb-2 p-2 bg-green-100 text-green-800 rounded text-sm font-semibold flex items-center">
+                          <CheckCircle className="w-4 h-4 mr-2" /> Seu pedido foi confirmado pelo restaurante!
+                        </div>
+                      )}
+                      {pedido.status === 'out_for_delivery' && (
+                        <div className="mb-2 p-2 bg-orange-100 text-orange-800 rounded text-sm font-semibold flex items-center">
+                          <HamburgerIcon className="w-4 h-4 mr-2" /> Seu pedido saiu para entrega!
+                        </div>
+                      )}
                       
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">

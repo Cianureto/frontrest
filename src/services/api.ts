@@ -123,10 +123,37 @@ export const clienteAPI = {
     };
   },
 
-  getPedidos: async (): Promise<Pedido[]> => {
-    // Como não há rota específica para pedidos do cliente, vamos retornar um array vazio
-    // Em uma implementação real, seria necessário criar essa rota no backend
-    return [];
+  getPedidos: async (telefone?: string): Promise<Pedido[]> => {
+    if (!telefone) return [];
+    const response = await api.get(`/api/customers/${telefone}/orders`);
+    const produtos = await clienteAPI.getProdutos();
+    return response.data.map((order: any) => ({
+      id: order.id,
+      cliente_id: 0,
+      cliente: {
+        id: 0,
+        nome: order.customer_name || 'Cliente',
+        telefone: order.customer_phone || '0000000000',
+        data_cadastro: new Date().toISOString()
+      },
+      itens: order.items.map((item: any) => ({
+        produto_id: item.menu_item_id,
+        produto: produtos.find((p: Produto) => p.id === item.menu_item_id) || {
+          id: item.menu_item_id,
+          nome: 'Produto',
+          descricao: '',
+          preco: item.price,
+          categoria: 'Geral',
+          disponivel: true
+        },
+        quantidade: item.quantity,
+        preco_unitario: item.price
+      })),
+      total: order.total,
+      status: order.status,
+      data_pedido: order.created_at,
+      observacoes: ''
+    }));
   },
 
   getPedido: async (id: number): Promise<Pedido> => {

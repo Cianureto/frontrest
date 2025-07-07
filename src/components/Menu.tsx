@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Produto } from '../types';
 import { clienteAPI } from '../services/api';
 import { useCart } from '../contexts/CartContext';
@@ -10,10 +10,14 @@ const Menu: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState<string>('todas');
+  const [maisVendidos, setMaisVendidos] = useState<any[]>([]);
   const { addItem } = useCart();
 
   useEffect(() => {
     carregarProdutos();
+    carregarMaisVendidos();
+    const interval = setInterval(carregarMaisVendidos, 30000); // Atualiza a cada 30s
+    return () => clearInterval(interval);
   }, []);
 
   const carregarProdutos = async () => {
@@ -26,6 +30,21 @@ const Menu: React.FC = () => {
       console.error('Erro:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const carregarMaisVendidos = async () => {
+    try {
+      const token = localStorage.getItem('cliente_token');
+      const response = await fetch('http://localhost:3001/api/reports/top-products?limit=5', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      setMaisVendidos(data);
+    } catch (error) {
+      setMaisVendidos([]);
     }
   };
 
@@ -44,6 +63,19 @@ const Menu: React.FC = () => {
       style: 'currency',
       currency: 'BRL'
     }).format(price);
+  };
+
+  const maisVendidosRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollMaisVendidos = (direction: 'left' | 'right') => {
+    if (maisVendidosRef.current) {
+      const scrollAmount = 240; // largura do card + gap
+      if (direction === 'left') {
+        maisVendidosRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        maisVendidosRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
   };
 
   if (loading) {
@@ -65,6 +97,62 @@ const Menu: React.FC = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Cardápio</h1>
           <p className="text-gray-600">Escolha os produtos que deseja pedir</p>
+        </div>
+
+        {/* Mais Vendidos - agora logo após o header */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Mais Vendidos</h2>
+          <div className="relative">
+            <button
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow rounded-full p-1 hover:bg-gray-100 disabled:opacity-30"
+              onClick={() => scrollMaisVendidos('left')}
+              aria-label="Rolar para a esquerda"
+              type="button"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <div
+              ref={maisVendidosRef}
+              className="flex space-x-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scroll-smooth"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {maisVendidos.length === 0 ? (
+                <span className="text-gray-500">Nenhum dado disponível.</span>
+              ) : (
+                maisVendidos.map((item, idx) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-lg shadow p-6 min-w-[300px] max-w-[300px] flex-shrink-0 flex flex-col items-center cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => {
+                      const produto = produtos.find(p => p.id === item.id);
+                      if (produto) handleAddToCart(produto);
+                    }}
+                    title="Clique para adicionar ao carrinho"
+                  >
+                    {item.image ? (
+                      <img src={item.image} alt={item.name} className="w-32 h-32 object-cover rounded mb-4" />
+                    ) : (
+                      <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded mb-4">
+                        <span className="text-gray-400 text-xs">Sem imagem</span>
+                      </div>
+                    )}
+                    <div className="font-bold text-primary-600 text-lg">{idx + 1}º</div>
+                    <div className="text-gray-900 text-center text-base font-semibold mt-2">{item.name}</div>
+                    <div className="text-sm text-gray-500">Vendidos: {item.total_sold}</div>
+                    <span className="mt-3 text-sm text-primary-600 underline">Adicionar ao carrinho</span>
+                  </div>
+                ))
+              )}
+            </div>
+            <button
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow rounded-full p-1 hover:bg-gray-100 disabled:opacity-30"
+              onClick={() => scrollMaisVendidos('right')}
+              aria-label="Rolar para a direita"
+              type="button"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
         {error && (
