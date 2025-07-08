@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, Clock, CheckCircle, XCircle, Truck, Eye } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Truck, Eye, TrendingUp, Calendar } from 'lucide-react';
 import { Pedido } from '../types';
 import { clienteAPI } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
-import HamburgerIcon from './icons/HamburgerIcon';
 
 const Orders: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -13,18 +11,19 @@ const Orders: React.FC = () => {
   const [error, setError] = useState('');
   const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
   const navigate = useNavigate();
-  const { cliente } = useAuth();
 
   useEffect(() => {
-    if (cliente?.telefone) {
-      carregarPedidos(cliente.telefone);
-    }
-  }, [cliente]);
+    carregarPedidos();
+    const interval = setInterval(() => {
+      carregarPedidos();
+    }, 5000); // Atualiza a cada 5 segundos
+    return () => clearInterval(interval);
+  }, []);
 
-  const carregarPedidos = async (telefone: string) => {
+  const carregarPedidos = async () => {
     try {
       setLoading(true);
-      const data = await clienteAPI.getPedidos(telefone);
+      const data = await clienteAPI.getPedidos();
       setPedidos(data);
     } catch (error: any) {
       setError('Erro ao carregar pedidos');
@@ -58,6 +57,7 @@ const Orders: React.FC = () => {
           icon: Clock,
           color: 'text-yellow-600',
           bgColor: 'bg-yellow-100',
+          borderColor: 'border-yellow-200',
           text: 'Pendente'
         };
       case 'preparando':
@@ -65,20 +65,15 @@ const Orders: React.FC = () => {
           icon: Package,
           color: 'text-blue-600',
           bgColor: 'bg-blue-100',
+          borderColor: 'border-blue-200',
           text: 'Preparando'
-        };
-      case 'out_for_delivery':
-        return {
-          icon: HamburgerIcon,
-          color: 'text-orange-600',
-          bgColor: 'bg-orange-100',
-          text: 'Saiu para entrega'
         };
       case 'pronto':
         return {
           icon: CheckCircle,
           color: 'text-green-600',
           bgColor: 'bg-green-100',
+          borderColor: 'border-green-200',
           text: 'Pronto'
         };
       case 'entregue':
@@ -86,6 +81,7 @@ const Orders: React.FC = () => {
           icon: Truck,
           color: 'text-green-600',
           bgColor: 'bg-green-100',
+          borderColor: 'border-green-200',
           text: 'Entregue'
         };
       case 'cancelado':
@@ -93,6 +89,7 @@ const Orders: React.FC = () => {
           icon: XCircle,
           color: 'text-red-600',
           bgColor: 'bg-red-100',
+          borderColor: 'border-red-200',
           text: 'Cancelado'
         };
       default:
@@ -100,6 +97,7 @@ const Orders: React.FC = () => {
           icon: Clock,
           color: 'text-gray-600',
           bgColor: 'bg-gray-100',
+          borderColor: 'border-gray-200',
           text: status
         };
     }
@@ -120,10 +118,13 @@ const Orders: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen gradient-bg py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center h-64">
-            <div className="text-lg text-gray-600">Carregando pedidos...</div>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-lg text-gray-600 font-medium">Carregando pedidos...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -131,52 +132,60 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen gradient-bg py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-6">
             <button
               onClick={handleBackToMenu}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-all duration-300 hover:bg-blue-50 px-4 py-2 rounded-xl"
             >
               <span>← Voltar ao cardápio</span>
             </button>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Meus Pedidos</h1>
-          <p className="text-gray-600">
-            Acompanhe o status dos seus pedidos
-          </p>
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              Meus Pedidos
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Acompanhe o status dos seus pedidos
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center space-x-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            <span>{error}</span>
           </div>
         )}
 
         {pedidos.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Package className="w-8 h-8 text-gray-400" />
+          <div className="card p-8 text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Package className="w-12 h-12 text-gray-400" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Nenhum pedido encontrado</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-600 to-gray-700 bg-clip-text text-transparent mb-4">
+              Nenhum pedido encontrado
+            </h2>
+            <p className="text-gray-600 text-lg mb-8">
               Você ainda não fez nenhum pedido. Que tal começar agora?
             </p>
             <button
               onClick={handleBackToMenu}
-              className="bg-primary-500 text-white px-6 py-3 rounded-md hover:bg-primary-600 transition-colors"
+              className="btn-primary"
             >
               Ver cardápio
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Lista de pedidos */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Histórico de pedidos
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                <TrendingUp className="w-6 h-6 text-blue-600" />
+                <span>Histórico de pedidos</span>
               </h2>
               <div className="space-y-4">
                 {pedidos.map((pedido) => {
@@ -186,52 +195,38 @@ const Orders: React.FC = () => {
                   return (
                     <div
                       key={pedido.id}
-                      className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                      className="card p-6 hover:scale-105 transition-all duration-300 cursor-pointer group"
                       onClick={() => handleViewPedido(pedido.id)}
                     >
                       <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-8 h-8 ${statusInfo.bgColor} rounded-full flex items-center justify-center`}>
-                            <StatusIcon className={`w-4 h-4 ${statusInfo.color}`} />
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-12 h-12 ${statusInfo.bgColor} rounded-xl flex items-center justify-center border-2 ${statusInfo.borderColor}`}>
+                            <StatusIcon className={`w-6 h-6 ${statusInfo.color}`} />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-gray-900">
+                            <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                               Pedido #{pedido.id}
                             </h3>
-                            <p className="text-sm text-gray-500">
-                              {formatDate(pedido.data_pedido)}
-                            </p>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <Calendar className="w-4 h-4" />
+                              <span>{formatDate(pedido.data_pedido)}</span>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.color}`}>
+                        <div className="flex items-center space-x-3">
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusInfo.bgColor} ${statusInfo.color} border ${statusInfo.borderColor}`}>
                             {statusInfo.text}
                           </span>
-                          <Eye size={16} className="text-gray-400" />
+                          <Eye size={18} className="text-gray-400 group-hover:text-blue-600 transition-colors" />
                         </div>
                       </div>
-                      {/* Confirmação visual para o cliente */}
-                      {pedido.status === 'preparando' && (
-                        <div className="mb-2 p-2 bg-green-100 text-green-800 rounded text-sm font-semibold flex items-center">
-                          <CheckCircle className="w-4 h-4 mr-2" /> Seu pedido foi confirmado pelo restaurante!
-                        </div>
-                      )}
-                      {pedido.status === 'out_for_delivery' && (
-                        <div className="mb-2 p-2 bg-orange-100 text-orange-800 rounded text-sm font-semibold flex items-center">
-                          <HamburgerIcon className="w-4 h-4 mr-2" /> Seu pedido saiu para entrega!
-                        </div>
-                      )}
                       
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Itens:</span>
-                          <span className="font-medium">{pedido.itens.length}</span>
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                          {pedido.itens.length} {pedido.itens.length === 1 ? 'item' : 'itens'}
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Total:</span>
-                          <span className="font-semibold text-primary-600">
-                            {formatPrice(pedido.total)}
-                          </span>
+                        <div className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                          {formatPrice(pedido.total)}
                         </div>
                       </div>
                     </div>
@@ -242,45 +237,36 @@ const Orders: React.FC = () => {
 
             {/* Detalhes do pedido selecionado */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Detalhes do pedido
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                <Eye className="w-6 h-6 text-blue-600" />
+                <span>Detalhes do pedido</span>
               </h2>
               
               {selectedPedido ? (
-                <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="card p-6">
                   <div className="mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Pedido #{selectedPedido.id}
-                      </h3>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusInfo(selectedPedido.status).bgColor} ${getStatusInfo(selectedPedido.status).color}`}>
-                        {getStatusInfo(selectedPedido.status).text}
-                      </span>
-                    </div>
-                    
-                    <div className="space-y-2 text-sm text-gray-600">
-                      <div>
-                        <span className="font-medium">Data:</span> {formatDate(selectedPedido.data_pedido)}
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Pedido #{selectedPedido.id}
+                    </h3>
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{formatDate(selectedPedido.data_pedido)}</span>
                       </div>
-                      {selectedPedido.observacoes && (
-                        <div>
-                          <span className="font-medium">Observações:</span> {selectedPedido.observacoes}
-                        </div>
-                      )}
+                      <div className="flex items-center space-x-1">
+                        <Package className="w-4 h-4" />
+                        <span>{selectedPedido.itens.length} {selectedPedido.itens.length === 1 ? 'item' : 'itens'}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">Itens do pedido:</h4>
-                    {selectedPedido.itens.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                        <div>
-                          <p className="font-medium text-gray-900">
+                  <div className="space-y-4 mb-6">
+                    {selectedPedido.itens.map((item) => (
+                      <div key={item.produto_id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <div className="flex-1">
+                          <span className="font-medium text-gray-900">
                             {item.quantidade}x {item.produto.nome}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {formatPrice(item.preco_unitario)} cada
-                          </p>
+                          </span>
                         </div>
                         <span className="font-semibold text-gray-900">
                           {formatPrice(item.preco_unitario * item.quantidade)}
@@ -289,22 +275,30 @@ const Orders: React.FC = () => {
                     ))}
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-gray-900">Total</span>
-                      <span className="text-2xl font-bold text-primary-600">
+                      <span className="text-xl font-bold text-gray-900">Total</span>
+                      <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         {formatPrice(selectedPedido.total)}
                       </span>
                     </div>
                   </div>
+
+                  {selectedPedido.observacoes && (
+                    <div className="mt-6 p-4 bg-blue-50 rounded-xl">
+                      <h4 className="font-medium text-blue-900 mb-2">Observações:</h4>
+                      <p className="text-blue-800">{selectedPedido.observacoes}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Eye className="w-6 h-6 text-gray-400" />
+                <div className="card p-8 text-center">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Eye className="w-8 h-8 text-gray-400" />
                   </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Selecione um pedido</h3>
                   <p className="text-gray-600">
-                    Selecione um pedido para ver os detalhes
+                    Clique em um pedido para ver os detalhes
                   </p>
                 </div>
               )}

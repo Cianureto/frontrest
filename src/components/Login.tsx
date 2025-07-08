@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, User, Mail, MapPin } from 'lucide-react';
+import { Phone, User, Mail, MapPin, ChefHat, Sparkles, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { clienteAPI } from '../services/api';
 
@@ -13,13 +13,12 @@ const Login: React.FC = () => {
   // Login form
   const [telefone, setTelefone] = useState('');
   const [senha, setSenha] = useState('');
-  const [showSenha, setShowSenha] = useState(false);
   
   // Register form
   const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
   const [endereco, setEndereco] = useState('');
   const [idade, setIdade] = useState('');
+  const [senhaCadastro, setSenhaCadastro] = useState('');
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -46,16 +45,15 @@ const Login: React.FC = () => {
 
     try {
       await clienteAPI.cadastrar({
-        nome,
-        telefone,
-        email: email || undefined,
-        endereco: endereco || undefined,
-        idade: parseInt(idade),
-        password: senha
+        name: nome,
+        phone: telefone,
+        address: endereco,
+        age: parseInt(idade),
+        password: senhaCadastro
       });
 
       // Fazer login automaticamente após cadastro
-      await login(telefone, senha);
+      await login(telefone, senhaCadastro);
       navigate('/menu');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Erro ao fazer cadastro');
@@ -73,26 +71,39 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-xl">R</span>
-          </div>
-        </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          {isLogin ? 'Entrar na sua conta' : 'Criar nova conta'}
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          {isLogin ? 'Faça login com seu telefone' : 'Cadastre-se para começar'}
-        </p>
+    <div className="min-h-screen gradient-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div className="relative sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center mb-8">
+          <div className="relative">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl">
+              <ChefHat className="w-8 h-8 text-white" />
+            </div>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            {isLogin ? 'Bem-vindo de volta!' : 'Junte-se a nós!'}
+          </h2>
+          <p className="text-gray-600 text-lg">
+            {isLogin ? 'Faça login para continuar' : 'Crie sua conta para começar'}
+          </p>
+        </div>
+
+        <div className="card p-8">
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center space-x-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span>{error}</span>
             </div>
           )}
 
@@ -100,11 +111,11 @@ const Login: React.FC = () => {
             {!isLogin && (
               <>
                 <div>
-                  <label htmlFor="nome" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-2">
                     Nome completo
                   </label>
-                  <div className="mt-1 relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <User className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
@@ -114,68 +125,67 @@ const Login: React.FC = () => {
                       required
                       value={nome}
                       onChange={(e) => setNome(e.target.value)}
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      className="input-field pl-12"
                       placeholder="Seu nome completo"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email (opcional)
+                  <label htmlFor="endereco" className="block text-sm font-medium text-gray-700 mb-2">
+                    Endereço
                   </label>
-                  <div className="mt-1 relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                      placeholder="seu@email.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="endereco" className="block text-sm font-medium text-gray-700">
-                    Endereço (opcional)
-                  </label>
-                  <div className="mt-1 relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <MapPin className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       id="endereco"
                       name="endereco"
                       type="text"
+                      required
                       value={endereco}
                       onChange={(e) => setEndereco(e.target.value)}
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                      className="input-field pl-12"
                       placeholder="Seu endereço"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="idade" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="idade" className="block text-sm font-medium text-gray-700 mb-2">
                     Idade
                   </label>
-                  <div className="mt-1">
+                  <input
+                    id="idade"
+                    name="idade"
+                    type="number"
+                    required
+                    min="18"
+                    max="120"
+                    value={idade}
+                    onChange={(e) => setIdade(e.target.value)}
+                    className="input-field"
+                    placeholder="18"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="senhaCadastro" className="block text-sm font-medium text-gray-700 mb-2">
+                    Senha
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
                     <input
-                      id="idade"
-                      name="idade"
-                      type="number"
+                      id="senhaCadastro"
+                      name="senhaCadastro"
+                      type="password"
                       required
-                      min="18"
-                      max="120"
-                      value={idade}
-                      onChange={(e) => setIdade(e.target.value)}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                      placeholder="18"
+                      value={senhaCadastro}
+                      onChange={(e) => setSenhaCadastro(e.target.value)}
+                      className="input-field pl-12"
+                      placeholder="Crie uma senha"
                     />
                   </div>
                 </div>
@@ -183,11 +193,11 @@ const Login: React.FC = () => {
             )}
 
             <div>
-              <label htmlFor="telefone" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-2">
                 Telefone
               </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Phone className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
@@ -197,85 +207,57 @@ const Login: React.FC = () => {
                   required
                   value={telefone}
                   onChange={(e) => setTelefone(formatPhone(e.target.value))}
-                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="input-field pl-12"
                   placeholder="(11) 99999-9999"
                 />
               </div>
             </div>
-
-            {/* Campo de senha para login e cadastro */}
-            <div>
-              <label htmlFor="senha" className="block text-sm font-medium text-gray-700">
-                Senha
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  id="senha"
-                  name="senha"
-                  type={showSenha ? 'text' : 'password'}
-                  required
-                  value={senha}
-                  onChange={e => setSenha(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm pr-10"
-                  placeholder="Digite sua senha"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowSenha(!showSenha)}
-                  tabIndex={-1}
-                >
-                  {showSenha ? (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  )}
-                </button>
+            {isLogin && (
+              <div>
+                <label htmlFor="senha" className="block text-sm font-medium text-gray-700 mb-2">
+                  Senha
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="senha"
+                    name="senha"
+                    type="password"
+                    required
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    className="input-field pl-12"
+                    placeholder="Digite sua senha"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Carregando...' : (isLogin ? 'Entrar' : 'Cadastrar')}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>{isLogin ? 'Entrando...' : 'Cadastrando...'}</span>
+                </div>
+              ) : (
+                isLogin ? 'Entrar' : 'Cadastrar'
+              )}
+            </button>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError('');
-                  setTelefone('');
-                  setNome('');
-                  setEmail('');
-                  setEndereco('');
-                  setIdade('');
-                  setSenha(''); // Reset password field
-                  setShowSenha(false); // Hide password field
-                }}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
-                {isLogin ? 'Criar nova conta' : 'Fazer login'}
-              </button>
-            </div>
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              {isLogin ? 'Não tem uma conta? Cadastre-se' : 'Já tem uma conta? Faça login'}
+            </button>
           </div>
         </div>
       </div>

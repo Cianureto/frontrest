@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Cliente, Produto, Pedido } from '../types';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -30,25 +30,24 @@ export const clienteAPI = {
   },
 
   cadastrar: async (dados: {
-    nome: string;
-    telefone: string;
-    email?: string;
-    endereco?: string;
-    idade: number;
+    name: string;
+    phone: string;
+    address: string;
+    age: number;
     password: string;
   }): Promise<{ cliente: Cliente; token: string }> => {
     // Primeiro cadastra o cliente
     await api.post('/api/customers/register', {
-      name: dados.nome,
-      phone: dados.telefone,
-      address: dados.endereco || '',
-      age: dados.idade,
+      name: dados.name,
+      phone: dados.phone,
+      address: dados.address,
+      age: dados.age,
       password: dados.password
     });
 
     // Depois faz login
-    const loginResponse = await api.post('/api/customers/login', {
-      phone: dados.telefone,
+    const loginResponse = await api.post('/api/customers/login', { 
+      phone: dados.phone,
       password: dados.password
     });
 
@@ -61,6 +60,19 @@ export const clienteAPI = {
   // Produtos
   getProdutos: async (): Promise<Produto[]> => {
     const response = await api.get('/api/menu');
+    return response.data.map((item: any) => ({
+      id: item.id,
+      nome: item.name,
+      descricao: item.description || '',
+      preco: item.price,
+      categoria: item.category || 'Geral',
+      disponivel: item.available === 1,
+      imagem: item.image
+    }));
+  },
+
+  getTopProdutos: async (): Promise<Produto[]> => {
+    const response = await api.get('/api/reports/top-products');
     return response.data.map((item: any) => ({
       id: item.id,
       nome: item.name,
@@ -191,6 +203,20 @@ export const clienteAPI = {
       observacoes: ''
     };
   },
+
+  getConfiguracoes: async (): Promise<any> => {
+    const response = await api.get('/api/settings');
+    return response.data;
+  },
 };
 
 export default api; 
+
+declare global {
+  interface ImportMeta {
+    env: {
+      VITE_API_URL: string;
+      [key: string]: any;
+    };
+  }
+} 

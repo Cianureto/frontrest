@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle, CreditCard, User, Phone, Mail, MapPin } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { clienteAPI } from '../services/api';
@@ -60,36 +60,36 @@ const Checkout: React.FC = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen gradient-bg py-8">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+          <div className="card p-8 text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
               Pedido realizado com sucesso!
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 text-lg mb-6">
               Seu pedido #{pedidoId} foi enviado e está sendo preparado.
             </p>
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-600">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 mb-8">
+              <p className="text-sm text-gray-700 mb-2">
                 <strong>Total do pedido:</strong> {formatPrice(total)}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-700">
                 <strong>Itens:</strong> {items.length} {items.length === 1 ? 'item' : 'itens'}
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleViewOrders}
-                className="flex-1 bg-primary-500 text-white px-6 py-3 rounded-md hover:bg-primary-600 transition-colors"
+                className="btn-primary flex-1"
               >
                 Ver meus pedidos
               </button>
               <button
                 onClick={handleBackToMenu}
-                className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-200 transition-colors"
+                className="btn-secondary flex-1"
               >
                 Fazer novo pedido
               </button>
@@ -102,21 +102,21 @@ const Checkout: React.FC = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen gradient-bg py-8">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="w-8 h-8 text-yellow-600" />
+          <div className="card p-8 text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-12 h-12 text-yellow-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-4">
               Carrinho vazio
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 text-lg mb-8">
               Adicione produtos ao carrinho antes de finalizar o pedido.
             </p>
             <button
               onClick={handleBackToMenu}
-              className="bg-primary-500 text-white px-6 py-3 rounded-md hover:bg-primary-600 transition-colors"
+              className="btn-primary"
             >
               Ver cardápio
             </button>
@@ -127,62 +127,81 @@ const Checkout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen gradient-bg py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center space-x-4 mb-4">
+          <div className="flex items-center space-x-4 mb-6">
             <button
               onClick={() => navigate('/carrinho')}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-all duration-300 hover:bg-blue-50 px-4 py-2 rounded-xl"
             >
               <ArrowLeft size={20} />
               <span>Voltar ao carrinho</span>
             </button>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Finalizar pedido</h1>
-          <p className="text-gray-600">Confirme os detalhes do seu pedido</p>
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              Finalizar pedido
+            </h1>
+            <p className="text-gray-600 text-lg">Confirme os detalhes do seu pedido</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Formulário */}
           <div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Informações do pedido
+            <div className="card p-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                <CreditCard className="w-6 h-6 text-blue-600" />
+                <span>Informações do pedido</span>
               </h2>
 
               {error && (
-                <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                  {error}
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <span>{error}</span>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Informações do cliente */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">
-                    Dados do cliente
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                    <User className="w-5 h-5 text-blue-600" />
+                    <span>Dados do cliente</span>
                   </h3>
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Nome:</span>
-                      <span className="ml-2 text-gray-900">{cliente?.nome}</span>
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <User className="w-5 h-5 text-gray-500" />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">Nome:</span>
+                        <span className="ml-2 text-gray-900">{cliente?.nome}</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Telefone:</span>
-                      <span className="ml-2 text-gray-900">{cliente?.telefone}</span>
+                    <div className="flex items-center space-x-3">
+                      <Phone className="w-5 h-5 text-gray-500" />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">Telefone:</span>
+                        <span className="ml-2 text-gray-900">{cliente?.telefone}</span>
+                      </div>
                     </div>
                     {cliente?.email && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Email:</span>
-                        <span className="ml-2 text-gray-900">{cliente.email}</span>
+                      <div className="flex items-center space-x-3">
+                        <Mail className="w-5 h-5 text-gray-500" />
+                        <div>
+                          <span className="text-sm font-medium text-gray-700">Email:</span>
+                          <span className="ml-2 text-gray-900">{cliente.email}</span>
+                        </div>
                       </div>
                     )}
                     {cliente?.endereco && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Endereço:</span>
-                        <span className="ml-2 text-gray-900">{cliente.endereco}</span>
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="w-5 h-5 text-gray-500" />
+                        <div>
+                          <span className="text-sm font-medium text-gray-700">Endereço:</span>
+                          <span className="ml-2 text-gray-900">{cliente.endereco}</span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -198,18 +217,24 @@ const Checkout: React.FC = () => {
                     rows={4}
                     value={observacoes}
                     onChange={(e) => setObservacoes(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="Instruções especiais, pedidos de modificação, etc."
+                    className="input-field resize-none"
+                    placeholder="Adicione observações especiais para o seu pedido..."
                   />
                 </div>
 
-                {/* Botão finalizar */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-primary-500 text-white py-3 px-4 rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Processando...' : 'Confirmar pedido'}
+                  {loading ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Finalizando pedido...</span>
+                    </div>
+                  ) : (
+                    'Confirmar pedido'
+                  )}
                 </button>
               </form>
             </div>
@@ -217,22 +242,19 @@ const Checkout: React.FC = () => {
 
           {/* Resumo do pedido */}
           <div>
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Resumo do pedido
+            <div className="card p-6 sticky top-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+                <CreditCard className="w-6 h-6 text-blue-600" />
+                <span>Resumo do pedido</span>
               </h2>
 
-              {/* Lista de itens */}
-              <div className="space-y-3 mb-6">
+              <div className="space-y-4 mb-6">
                 {items.map((item) => (
-                  <div key={item.produto.id} className="flex justify-between items-center">
+                  <div key={item.produto.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">
+                      <span className="text-gray-900 font-medium">
                         {item.quantidade}x {item.produto.nome}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {formatPrice(item.produto.preco)} cada
-                      </p>
+                      </span>
                     </div>
                     <span className="font-semibold text-gray-900">
                       {formatPrice(item.produto.preco * item.quantidade)}
@@ -241,26 +263,13 @@ const Checkout: React.FC = () => {
                 ))}
               </div>
 
-              {/* Total */}
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-900">Total</span>
-                  <span className="text-2xl font-bold text-primary-600">
+                  <span className="text-xl font-bold text-gray-900">Total</span>
+                  <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     {formatPrice(total)}
                   </span>
                 </div>
-              </div>
-
-              {/* Informações adicionais */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-sm font-medium text-blue-900 mb-2">
-                  Informações importantes
-                </h3>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Seu pedido será preparado assim que confirmado</li>
-                  <li>• Você receberá atualizações sobre o status</li>
-                  <li>• O tempo de preparo pode variar conforme a demanda</li>
-                </ul>
               </div>
             </div>
           </div>

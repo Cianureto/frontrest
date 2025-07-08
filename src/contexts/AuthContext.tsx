@@ -13,6 +13,13 @@ export const useAuth = () => {
   return context;
 };
 
+export interface AuthContextType {
+  cliente: Cliente | null;
+  login: (telefone: string, senha: string) => Promise<void>;
+  logout: () => void;
+  isAuthenticated: boolean;
+}
+
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -46,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: AuthProv
       const clienteMapeado = {
         id: c.id,
         nome: c.name || c.nome,
-        telefone: (c.phone || c.telefone || '').replace(/\D/g, ''), // só números
+        telefone: c.phone || c.telefone,
         email: c.email,
         endereco: c.address || c.endereco,
         data_cadastro: new Date().toISOString()
